@@ -497,24 +497,6 @@ resource "github_repository_deploy_key" "deploy_key" {
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
-# Projects
-# ---------------------------------------------------------------------------------------------------------------------
-
-locals {
-  projects = { for i in var.projects : lookup(i, "id", lower(i.name)) => merge({
-    body = null
-  }, i) }
-}
-
-resource "github_repository_project" "repository_project" {
-  for_each = local.projects
-
-  repository = github_repository.repository.name
-  name       = each.value.name
-  body       = each.value.body
-}
-
-# ---------------------------------------------------------------------------------------------------------------------
 # Webhooks
 # ---------------------------------------------------------------------------------------------------------------------
 
