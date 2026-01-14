@@ -38,6 +38,12 @@ resource "github_repository_environment" "this" {
   }
 }
 
+# Migrate from deprecated resource to new resource
+moved {
+  from = github_repository_deployment_branch_policy.this
+  to   = github_repository_environment_deployment_policy.this
+}
+
 resource "github_repository_environment_deployment_policy" "this" {
   for_each = merge([for envName, env in var.environments : merge([for bp in env.branch_patterns : { ("${envName}:${bp}") : {
     environment    = envName
