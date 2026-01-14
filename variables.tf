@@ -196,26 +196,6 @@ variable "template" {
   default = null
 }
 
-# NOTE: Repository forking (fork, source_owner, source_repo) is not supported in provider 6.9.1
-# These features may be available in future provider versions
-# variable "fork" {
-#   description = "(Optional) Set to true to create a fork of an existing repository. When set to true, both source_owner and source_repo must also be specified. (Default: false)"
-#   type        = bool
-#   default     = false
-# }
-#
-# variable "source_owner" {
-#   description = "(Optional) The GitHub username or organization that owns the repository being forked. Required when fork is true."
-#   type        = string
-#   default     = null
-# }
-#
-# variable "source_repo" {
-#   description = "(Optional) The name of the repository to fork. Required when fork is true."
-#   type        = string
-#   default     = null
-# }
-
 variable "admin_collaborators" {
   description = "(Optional) A list of users to add as collaborators granting them admin (full) permission."
   type        = list(string)
