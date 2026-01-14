@@ -11,7 +11,7 @@ locals {
   visibility                              = var.visibility == null ? lookup(var.defaults, "visibility", local.private_visibility) : var.visibility
   has_issues                              = var.has_issues == null ? lookup(var.defaults, "has_issues", false) : var.has_issues
   has_discussions                         = var.has_discussions == null ? lookup(var.defaults, "has_discussions", false) : var.has_discussions
-  has_projects                            = var.has_projects == null ? lookup(var.defaults, "has_projects", false) : length(var.projects) > 0 ? true : var.has_projects
+  has_projects                            = var.has_projects == null ? lookup(var.defaults, "has_projects", false) : var.has_projects
   has_wiki                                = var.has_wiki == null ? lookup(var.defaults, "has_wiki", false) : var.has_wiki
   allow_merge_commit                      = var.allow_merge_commit == null ? lookup(var.defaults, "allow_merge_commit", true) : var.allow_merge_commit
   allow_rebase_merge                      = var.allow_rebase_merge == null ? lookup(var.defaults, "allow_rebase_merge", false) : var.allow_rebase_merge
@@ -126,11 +126,6 @@ resource "github_repository" "repository" {
   vulnerability_alerts                    = local.vulnerability_alerts
   ignore_vulnerability_alerts_during_read = local.ignore_vulnerability_alerts_during_read
 
-  # Repository forking support
-  fork         = var.fork
-  source_owner = var.source_owner
-  source_repo  = var.source_repo
-
   dynamic "template" {
     for_each = local.template
 
@@ -165,13 +160,6 @@ resource "github_repository" "repository" {
         }
       }
 
-      dynamic "code_security" {
-        for_each = try(security_and_analysis.value.code_security, null) != null ? [security_and_analysis.value.code_security] : []
-        content {
-          status = code_security.value.status
-        }
-      }
-
       dynamic "secret_scanning" {
         for_each = try(security_and_analysis.value.secret_scanning, null) != null ? [security_and_analysis.value.secret_scanning] : []
         content {
@@ -183,20 +171,6 @@ resource "github_repository" "repository" {
         for_each = try(security_and_analysis.value.secret_scanning_push_protection, null) != null ? [security_and_analysis.value.secret_scanning_push_protection] : []
         content {
           status = secret_scanning_push_protection.value.status
-        }
-      }
-
-      dynamic "secret_scanning_ai_detection" {
-        for_each = try(security_and_analysis.value.secret_scanning_ai_detection, null) != null ? [security_and_analysis.value.secret_scanning_ai_detection] : []
-        content {
-          status = secret_scanning_ai_detection.value.status
-        }
-      }
-
-      dynamic "secret_scanning_non_provider_patterns" {
-        for_each = try(security_and_analysis.value.secret_scanning_non_provider_patterns, null) != null ? [security_and_analysis.value.secret_scanning_non_provider_patterns] : []
-        content {
-          status = secret_scanning_non_provider_patterns.value.status
         }
       }
     }
@@ -578,22 +552,6 @@ resource "github_repository_deploy_key" "deploy_key" {
 
 # ---------------------------------------------------------------------------------------------------------------------
 # Projects
-# ---------------------------------------------------------------------------------------------------------------------
-
-locals {
-  projects = { for i in var.projects : lookup(i, "id", lower(i.name)) => merge({
-    body = null
-  }, i) }
-}
-
-resource "github_repository_project" "repository_project" {
-  for_each = local.projects
-
-  repository = github_repository.repository.name
-  name       = each.value.name
-  body       = each.value.body
-}
-
 # ---------------------------------------------------------------------------------------------------------------------
 # Webhooks
 # ---------------------------------------------------------------------------------------------------------------------

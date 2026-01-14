@@ -196,23 +196,25 @@ variable "template" {
   default = null
 }
 
-variable "fork" {
-  description = "(Optional) Set to true to create a fork of an existing repository. When set to true, both source_owner and source_repo must also be specified. (Default: false)"
-  type        = bool
-  default     = false
-}
-
-variable "source_owner" {
-  description = "(Optional) The GitHub username or organization that owns the repository being forked. Required when fork is true."
-  type        = string
-  default     = null
-}
-
-variable "source_repo" {
-  description = "(Optional) The name of the repository to fork. Required when fork is true."
-  type        = string
-  default     = null
-}
+# NOTE: Repository forking (fork, source_owner, source_repo) is not supported in provider 6.9.1
+# These features may be available in future provider versions
+# variable "fork" {
+#   description = "(Optional) Set to true to create a fork of an existing repository. When set to true, both source_owner and source_repo must also be specified. (Default: false)"
+#   type        = bool
+#   default     = false
+# }
+#
+# variable "source_owner" {
+#   description = "(Optional) The GitHub username or organization that owns the repository being forked. Required when fork is true."
+#   type        = string
+#   default     = null
+# }
+#
+# variable "source_repo" {
+#   description = "(Optional) The name of the repository to fork. Required when fork is true."
+#   type        = string
+#   default     = null
+# }
 
 variable "admin_collaborators" {
   description = "(Optional) A list of users to add as collaborators granting them admin (full) permission."
@@ -487,23 +489,9 @@ variable "deploy_keys_computed" {
   default = []
 }
 
-variable "projects" {
-  description = "(Optional) Create and manage projects for GitHub repository."
-  type = list(object({
-    name = string
-    body = string
-  }))
-
-  # Example:
-  # projects = [
-  #   {
-  #     name = "Testproject"
-  #     body = "This is a fancy test project for testing"
-  #   }
-  # ]
-
-  default = []
-}
+# Note: Classic GitHub Projects support has been removed.
+# GitHub has deprecated the classic projects API.
+# Use GitHub Projects (v2) through the GitHub UI or API instead.
 
 variable "webhooks" {
   description = "(Optional) Configuring webhooks. For details please check: https://www.terraform.io/docs/providers/github/r/repository_webhook.html"
@@ -595,23 +583,16 @@ variable "security_and_analysis" {
     advanced_security = optional(object({
       status = string
     }))
-    code_security = optional(object({
-      status = string
-    }))
     secret_scanning = optional(object({
       status = string
     }))
     secret_scanning_push_protection = optional(object({
       status = string
     }))
-    secret_scanning_ai_detection = optional(object({
-      status = string
-    }))
-    secret_scanning_non_provider_patterns = optional(object({
-      status = string
-    }))
+    # NOTE: The following options are not yet supported in provider 6.9.1:
+    # code_security, secret_scanning_ai_detection, secret_scanning_non_provider_patterns
   })
-  description = "(Optional) Security and analysis settings for the repository. Each nested block can have a 'status' of 'enabled' or 'disabled'."
+  description = "(Optional) Security and analysis settings for the repository. Supported blocks: advanced_security, secret_scanning, secret_scanning_push_protection. Each can have a 'status' of 'enabled' or 'disabled'."
   default     = null
 }
 
