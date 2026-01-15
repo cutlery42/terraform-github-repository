@@ -60,6 +60,12 @@ variable "has_issues" {
   default     = null
 }
 
+variable "has_discussions" {
+  description = "(Optional) Set to true to enable GitHub Discussions on the repository. (Default: false)"
+  type        = bool
+  default     = null
+}
+
 variable "has_projects" {
   description = "(Optional) Set to true to enable the GitHub Projects features on the repository. Per the github documentation when in an organization that has disabled repository projects it will default to false and will otherwise default to true. If you specify true when it has been disabled it will return an error.  (Default: false)"
   type        = bool
@@ -98,6 +104,12 @@ variable "allow_update_branch" {
 
 variable "allow_auto_merge" {
   description = "(Optional) Set to true to allow auto-merging pull requests on the repository. If enabled for a pull request, the pull request will merge automatically when all required reviews are met and status checks have passed. (Default: false)"
+  type        = bool
+  default     = null
+}
+
+variable "web_commit_signoff_required" {
+  description = "(Optional) Require contributors to sign off on web-based commits. See more https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/managing-repository-settings/managing-the-commit-signoff-policy-for-your-repository (Default: false)"
   type        = bool
   default     = null
 }
@@ -177,8 +189,9 @@ variable "extra_topics" {
 variable "template" {
   description = "(Optional) Template repository to use. (Default: {})"
   type = object({
-    owner      = string
-    repository = string
+    owner                = string
+    repository           = string
+    include_all_branches = optional(bool, false)
   })
   default = null
 }
@@ -456,23 +469,9 @@ variable "deploy_keys_computed" {
   default = []
 }
 
-variable "projects" {
-  description = "(Optional) Create and manage projects for GitHub repository."
-  type = list(object({
-    name = string
-    body = string
-  }))
-
-  # Example:
-  # projects = [
-  #   {
-  #     name = "Testproject"
-  #     body = "This is a fancy test project for testing"
-  #   }
-  # ]
-
-  default = []
-}
+# Note: Classic GitHub Projects support has been removed.
+# GitHub has deprecated the classic projects API.
+# Use GitHub Projects (v2) through the GitHub UI or API instead.
 
 variable "webhooks" {
   description = "(Optional) Configuring webhooks. For details please check: https://www.terraform.io/docs/providers/github/r/repository_webhook.html"
@@ -550,6 +549,30 @@ variable "autolink_references" {
 variable "vulnerability_alerts" {
   type        = bool
   description = "(Optional) Set to `false` to disable security alerts for vulnerable dependencies. Enabling requires alerts to be enabled on the owner level."
+  default     = null
+}
+
+variable "ignore_vulnerability_alerts_during_read" {
+  type        = bool
+  description = "(Optional) Set to true to not call the vulnerability alerts endpoint so the resource can also be used without admin permissions during read. (Default: false)"
+  default     = null
+}
+
+variable "security_and_analysis" {
+  type = object({
+    advanced_security = optional(object({
+      status = string
+    }))
+    secret_scanning = optional(object({
+      status = string
+    }))
+    secret_scanning_push_protection = optional(object({
+      status = string
+    }))
+    # NOTE: The following options are not yet supported in provider 6.9.1:
+    # code_security, secret_scanning_ai_detection, secret_scanning_non_provider_patterns
+  })
+  description = "(Optional) Security and analysis settings for the repository. Supported blocks: advanced_security, secret_scanning, secret_scanning_push_protection. Each can have a 'status' of 'enabled' or 'disabled'."
   default     = null
 }
 

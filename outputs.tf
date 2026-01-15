@@ -46,10 +46,7 @@ output "collaborators" {
   description = "A map of collaborator objects keyed by collaborator.name."
 }
 
-output "projects" {
-  value       = github_repository_project.repository_project
-  description = "A map of projects keyed by project input id."
-}
+# Note: Classic GitHub Projects output removed - API deprecated by GitHub
 
 output "issue_labels" {
   value       = github_issue_label.label

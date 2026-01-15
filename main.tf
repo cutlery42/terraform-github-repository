@@ -5,29 +5,32 @@
 
 # Set some opinionated default settings through var.defaults and locals
 locals {
-  homepage_url           = var.homepage_url == null ? lookup(var.defaults, "homepage_url", "") : var.homepage_url
-  private                = var.private == null ? lookup(var.defaults, "private", true) : var.private
-  private_visibility     = local.private ? "private" : "public"
-  visibility             = var.visibility == null ? lookup(var.defaults, "visibility", local.private_visibility) : var.visibility
-  has_issues             = var.has_issues == null ? lookup(var.defaults, "has_issues", false) : var.has_issues
-  has_projects           = var.has_projects == null ? lookup(var.defaults, "has_projects", false) : length(var.projects) > 0 ? true : var.has_projects
-  has_wiki               = var.has_wiki == null ? lookup(var.defaults, "has_wiki", false) : var.has_wiki
-  allow_merge_commit     = var.allow_merge_commit == null ? lookup(var.defaults, "allow_merge_commit", true) : var.allow_merge_commit
-  allow_rebase_merge     = var.allow_rebase_merge == null ? lookup(var.defaults, "allow_rebase_merge", false) : var.allow_rebase_merge
-  allow_squash_merge     = var.allow_squash_merge == null ? lookup(var.defaults, "allow_squash_merge", false) : var.allow_squash_merge
-  allow_update_branch    = var.allow_update_branch == null ? lookup(var.defaults, "allow_update_branch", false) : var.allow_update_branch
-  allow_auto_merge       = var.allow_auto_merge == null ? lookup(var.defaults, "allow_auto_merge", false) : var.allow_auto_merge
-  delete_branch_on_merge = var.delete_branch_on_merge == null ? lookup(var.defaults, "delete_branch_on_merge", true) : var.delete_branch_on_merge
-  is_template            = var.is_template == null ? lookup(var.defaults, "is_template", false) : var.is_template
-  has_downloads          = var.has_downloads == null ? lookup(var.defaults, "has_downloads", false) : var.has_downloads
-  auto_init              = var.auto_init == null ? lookup(var.defaults, "auto_init", true) : var.auto_init
-  gitignore_template     = var.gitignore_template == null ? lookup(var.defaults, "gitignore_template", "") : var.gitignore_template
-  license_template       = var.license_template == null ? lookup(var.defaults, "license_template", "") : var.license_template
-  default_branch         = var.default_branch == null ? lookup(var.defaults, "default_branch", null) : var.default_branch
-  standard_topics        = var.topics == null ? lookup(var.defaults, "topics", []) : var.topics
-  topics                 = concat(local.standard_topics, var.extra_topics)
-  template               = var.template == null ? [] : [var.template]
-  issue_labels_create    = var.issue_labels_create == null ? lookup(var.defaults, "issue_labels_create", local.issue_labels_create_computed) : var.issue_labels_create
+  homepage_url                            = var.homepage_url == null ? lookup(var.defaults, "homepage_url", "") : var.homepage_url
+  private                                 = var.private == null ? lookup(var.defaults, "private", true) : var.private
+  private_visibility                      = local.private ? "private" : "public"
+  visibility                              = var.visibility == null ? lookup(var.defaults, "visibility", local.private_visibility) : var.visibility
+  has_issues                              = var.has_issues == null ? lookup(var.defaults, "has_issues", false) : var.has_issues
+  has_discussions                         = var.has_discussions == null ? lookup(var.defaults, "has_discussions", false) : var.has_discussions
+  has_projects                            = var.has_projects == null ? lookup(var.defaults, "has_projects", false) : var.has_projects
+  has_wiki                                = var.has_wiki == null ? lookup(var.defaults, "has_wiki", false) : var.has_wiki
+  allow_merge_commit                      = var.allow_merge_commit == null ? lookup(var.defaults, "allow_merge_commit", true) : var.allow_merge_commit
+  allow_rebase_merge                      = var.allow_rebase_merge == null ? lookup(var.defaults, "allow_rebase_merge", false) : var.allow_rebase_merge
+  allow_squash_merge                      = var.allow_squash_merge == null ? lookup(var.defaults, "allow_squash_merge", false) : var.allow_squash_merge
+  allow_update_branch                     = var.allow_update_branch == null ? lookup(var.defaults, "allow_update_branch", false) : var.allow_update_branch
+  allow_auto_merge                        = var.allow_auto_merge == null ? lookup(var.defaults, "allow_auto_merge", false) : var.allow_auto_merge
+  delete_branch_on_merge                  = var.delete_branch_on_merge == null ? lookup(var.defaults, "delete_branch_on_merge", true) : var.delete_branch_on_merge
+  web_commit_signoff_required             = var.web_commit_signoff_required == null ? lookup(var.defaults, "web_commit_signoff_required", false) : var.web_commit_signoff_required
+  is_template                             = var.is_template == null ? lookup(var.defaults, "is_template", false) : var.is_template
+  has_downloads                           = var.has_downloads == null ? lookup(var.defaults, "has_downloads", false) : var.has_downloads
+  auto_init                               = var.auto_init == null ? lookup(var.defaults, "auto_init", true) : var.auto_init
+  gitignore_template                      = var.gitignore_template == null ? lookup(var.defaults, "gitignore_template", "") : var.gitignore_template
+  license_template                        = var.license_template == null ? lookup(var.defaults, "license_template", "") : var.license_template
+  default_branch                          = var.default_branch == null ? lookup(var.defaults, "default_branch", null) : var.default_branch
+  standard_topics                         = var.topics == null ? lookup(var.defaults, "topics", []) : var.topics
+  topics                                  = concat(local.standard_topics, var.extra_topics)
+  template                                = var.template == null ? [] : [var.template]
+  issue_labels_create                     = var.issue_labels_create == null ? lookup(var.defaults, "issue_labels_create", local.issue_labels_create_computed) : var.issue_labels_create
+  ignore_vulnerability_alerts_during_read = var.ignore_vulnerability_alerts_during_read == null ? lookup(var.defaults, "ignore_vulnerability_alerts_during_read", false) : var.ignore_vulnerability_alerts_during_read
 
   issue_labels_create_computed = local.has_issues || length(var.issue_labels) > 0
 
@@ -91,41 +94,45 @@ locals {
 # ---------------------------------------------------------------------------------------------------------------------
 
 resource "github_repository" "repository" {
-  name                   = var.name
-  description            = var.description
-  homepage_url           = local.homepage_url
-  visibility             = local.visibility
-  has_issues             = local.has_issues
-  has_projects           = local.has_projects
-  has_wiki               = local.has_wiki
-  allow_merge_commit     = local.allow_merge_commit
-  allow_rebase_merge     = local.allow_rebase_merge
-  allow_squash_merge     = local.allow_squash_merge
-  allow_update_branch    = local.allow_update_branch
-  allow_auto_merge       = local.allow_auto_merge
-  delete_branch_on_merge = local.delete_branch_on_merge
-  is_template            = local.is_template
-  has_downloads          = local.has_downloads
-  auto_init              = local.auto_init
-  gitignore_template     = local.gitignore_template
-  license_template       = local.license_template
-  archived               = var.archived
-  topics                 = local.topics
+  name                        = var.name
+  description                 = var.description
+  homepage_url                = local.homepage_url
+  visibility                  = local.visibility
+  has_issues                  = local.has_issues
+  has_discussions             = local.has_discussions
+  has_projects                = local.has_projects
+  has_wiki                    = local.has_wiki
+  allow_merge_commit          = local.allow_merge_commit
+  allow_rebase_merge          = local.allow_rebase_merge
+  allow_squash_merge          = local.allow_squash_merge
+  allow_update_branch         = local.allow_update_branch
+  allow_auto_merge            = local.allow_auto_merge
+  delete_branch_on_merge      = local.delete_branch_on_merge
+  web_commit_signoff_required = local.web_commit_signoff_required
+  is_template                 = local.is_template
+  has_downloads               = local.has_downloads
+  auto_init                   = local.auto_init
+  gitignore_template          = local.gitignore_template
+  license_template            = local.license_template
+  archived                    = var.archived
+  topics                      = local.topics
 
   squash_merge_commit_title   = var.squash_merge_commit_title
   squash_merge_commit_message = var.squash_merge_commit_message
   merge_commit_title          = var.merge_commit_title
   merge_commit_message        = var.merge_commit_message
 
-  archive_on_destroy   = var.archive_on_destroy
-  vulnerability_alerts = local.vulnerability_alerts
+  archive_on_destroy                      = var.archive_on_destroy
+  vulnerability_alerts                    = local.vulnerability_alerts
+  ignore_vulnerability_alerts_during_read = local.ignore_vulnerability_alerts_during_read
 
   dynamic "template" {
     for_each = local.template
 
     content {
-      owner      = template.value.owner
-      repository = template.value.repository
+      owner                = template.value.owner
+      repository           = template.value.repository
+      include_all_branches = try(template.value.include_all_branches, false)
     }
   }
 
@@ -139,6 +146,33 @@ resource "github_repository" "repository" {
       }
       cname      = try(var.pages.cname, null)
       build_type = try(var.pages.build_type, null)
+    }
+  }
+
+  dynamic "security_and_analysis" {
+    for_each = var.security_and_analysis != null ? [var.security_and_analysis] : []
+
+    content {
+      dynamic "advanced_security" {
+        for_each = try(security_and_analysis.value.advanced_security, null) != null ? [security_and_analysis.value.advanced_security] : []
+        content {
+          status = advanced_security.value.status
+        }
+      }
+
+      dynamic "secret_scanning" {
+        for_each = try(security_and_analysis.value.secret_scanning, null) != null ? [security_and_analysis.value.secret_scanning] : []
+        content {
+          status = secret_scanning.value.status
+        }
+      }
+
+      dynamic "secret_scanning_push_protection" {
+        for_each = try(security_and_analysis.value.secret_scanning_push_protection, null) != null ? [security_and_analysis.value.secret_scanning_push_protection] : []
+        content {
+          status = secret_scanning_push_protection.value.status
+        }
+      }
     }
   }
 
@@ -213,6 +247,7 @@ resource "github_branch_protection" "branch_protection" {
   allows_force_pushes             = try(var.branch_protections_v4[each.value].allows_force_pushes, false)
   enforce_admins                  = try(var.branch_protections_v4[each.value].enforce_admins, true)
   force_push_bypassers            = try(var.branch_protections_v4[each.value].force_push_bypassers, [])
+  lock_branch                     = try(var.branch_protections_v4[each.value].lock_branch, false)
   require_conversation_resolution = try(var.branch_protections_v4[each.value].require_conversation_resolution, false)
   require_signed_commits          = try(var.branch_protections_v4[each.value].require_signed_commits, false)
   required_linear_history         = try(var.branch_protections_v4[each.value].required_linear_history, false)
@@ -236,6 +271,7 @@ resource "github_branch_protection" "branch_protection" {
       pull_request_bypassers          = try(required_pull_request_reviews.value.pull_request_bypassers, [])
       require_code_owner_reviews      = try(required_pull_request_reviews.value.require_code_owner_reviews, true)
       required_approving_review_count = try(required_pull_request_reviews.value.required_approving_review_count, 0)
+      require_last_push_approval      = try(required_pull_request_reviews.value.require_last_push_approval, false)
     }
   }
 
@@ -516,22 +552,6 @@ resource "github_repository_deploy_key" "deploy_key" {
 
 # ---------------------------------------------------------------------------------------------------------------------
 # Projects
-# ---------------------------------------------------------------------------------------------------------------------
-
-locals {
-  projects = { for i in var.projects : lookup(i, "id", lower(i.name)) => merge({
-    body = null
-  }, i) }
-}
-
-resource "github_repository_project" "repository_project" {
-  for_each = local.projects
-
-  repository = github_repository.repository.name
-  name       = each.value.name
-  body       = each.value.body
-}
-
 # ---------------------------------------------------------------------------------------------------------------------
 # Webhooks
 # ---------------------------------------------------------------------------------------------------------------------
