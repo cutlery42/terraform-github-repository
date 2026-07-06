@@ -140,9 +140,15 @@ resource "github_repository" "repository" {
     for_each = var.pages != null ? [true] : []
 
     content {
-      source {
-        branch = var.pages.branch
-        path   = try(var.pages.path, "/")
+      # For workflow-based Pages (GitHub Actions) the API stores no branch/path
+      # source, so only render `source` for legacy (or unset) build types to
+      # avoid perpetual drift.
+      dynamic "source" {
+        for_each = try(var.pages.build_type, null) != "workflow" ? [true] : []
+        content {
+          branch = var.pages.branch
+          path   = try(var.pages.path, "/")
+        }
       }
       cname      = try(var.pages.cname, null)
       build_type = try(var.pages.build_type, null)
