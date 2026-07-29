@@ -193,6 +193,20 @@ resource "github_repository" "repository" {
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
+# Dependabot security updates
+# Requires vulnerability_alerts to be enabled on the repository.
+# https://registry.terraform.io/providers/integrations/github/latest/docs/resources/repository_dependabot_security_updates
+# ---------------------------------------------------------------------------------------------------------------------
+
+# A null value leaves the setting unmanaged rather than disabling it.
+resource "github_repository_dependabot_security_updates" "dependabot_security_updates" {
+  count = var.dependabot_security_updates != null ? 1 : 0
+
+  repository = github_repository.repository.name
+  enabled    = var.dependabot_security_updates
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
 # Manage branches
 # https://registry.terraform.io/providers/integrations/github/latest/docs/resources/branch
 # ---------------------------------------------------------------------------------------------------------------------

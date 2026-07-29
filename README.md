@@ -280,6 +280,12 @@ See [variables.tf] and [examples/] for details and use-cases.
   Set to `false` to disable security alerts for vulnerable dependencies.
   Enabling requires alerts to be enabled on the owner level.
 
+- [**`dependabot_security_updates`**](#var-dependabot_security_updates): *(Optional `bool`)*<a name="var-dependabot_security_updates"></a>
+
+  Set to `true` to let Dependabot open pull requests that fix vulnerable
+  dependencies. Requires `vulnerability_alerts` to be enabled. Leave
+  unset to not manage the setting at all.
+
 - [**`archive_on_destroy`**](#var-archive_on_destroy): *(Optional `bool`)*<a name="var-archive_on_destroy"></a>
 
   Set to `false` to not archive the repository instead of deleting on destroy.

@@ -350,6 +350,15 @@ section {
         END
       }
 
+      variable "dependabot_security_updates" {
+        type        = bool
+        description = <<-END
+          Set to `true` to let Dependabot open pull requests that fix vulnerable
+          dependencies. Requires `vulnerability_alerts` to be enabled. Leave
+          unset to not manage the setting at all.
+        END
+      }
+
       variable "archive_on_destroy" {
         type        = bool
         default     = true
